@@ -1,4 +1,4 @@
-package project.restaurantmanagement.model.Constants;
+package project.restaurantmanagement.model.Type;
 
 public enum ReservationStatus {
     ACCEPTED, // 승인

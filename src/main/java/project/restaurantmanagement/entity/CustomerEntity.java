@@ -1,20 +1,18 @@
 package project.restaurantmanagement.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import project.restaurantmanagement.dto.SignUpDto;
-import project.restaurantmanagement.model.Constants.UserType;
+import project.restaurantmanagement.model.Type.UserType;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static project.restaurantmanagement.model.Constants.UserType.CUSTOMER;
+import static project.restaurantmanagement.model.Type.UserType.CUSTOMER;
 
 /**
  * 고객 entity

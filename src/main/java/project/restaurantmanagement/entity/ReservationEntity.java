@@ -3,7 +3,7 @@ package project.restaurantmanagement.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import project.restaurantmanagement.dto.RegisterReservationDto;
-import project.restaurantmanagement.model.Constants.ReservationStatus;
+import project.restaurantmanagement.model.Type.ReservationStatus;
 
 import java.time.LocalDateTime;
 

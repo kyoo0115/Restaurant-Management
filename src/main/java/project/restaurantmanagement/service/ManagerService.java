@@ -15,7 +15,7 @@ import project.restaurantmanagement.entity.RestaurantEntity;
 import project.restaurantmanagement.exception.ReservationServiceException;
 import project.restaurantmanagement.exception.impl.AlreadyExistUserException;
 import project.restaurantmanagement.exception.impl.IncorrectPasswordException;
-import project.restaurantmanagement.model.Constants.AcceptStatus;
+import project.restaurantmanagement.model.Type.AcceptStatus;
 import project.restaurantmanagement.repository.ManagerRepository;
 import project.restaurantmanagement.repository.ReservationRepository;
 import project.restaurantmanagement.repository.RestaurantRepository;
@@ -24,7 +24,7 @@ import project.restaurantmanagement.security.TokenProvider;
 import java.util.List;
 
 import static project.restaurantmanagement.exception.ErrorCode.*;
-import static project.restaurantmanagement.model.Constants.ReservationStatus.*;
+import static project.restaurantmanagement.model.Type.ReservationStatus.*;
 
 @Slf4j
 @Service

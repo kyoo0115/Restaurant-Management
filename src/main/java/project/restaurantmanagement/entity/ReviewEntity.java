@@ -2,7 +2,7 @@ package project.restaurantmanagement.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import project.restaurantmanagement.dto.RegisterRestaurantDto;
+import project.restaurantmanagement.dto.ReviewDto;
 
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -21,7 +21,6 @@ public class ReviewEntity extends BaseEntity {
 
     private String title;
     private String comment;
-    private double rating;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "customer_id")
@@ -31,4 +30,21 @@ public class ReviewEntity extends BaseEntity {
     @JoinColumn(name = "restaurant_id")
     private RestaurantEntity restaurantEntity;
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "manager_id")
+    private ManagerEntity managerEntity;
+
+    private double rating;
+
+    public static ReviewEntity of(ReviewDto reviewDto, CustomerEntity customerEntity, ReservationEntity reservationEntity) {
+
+        return ReviewEntity.builder()
+                .title(reviewDto.getTitle())
+                .comment(reviewDto.getComments())
+                .customerEntity(customerEntity)
+                .restaurantEntity(reservationEntity.getRestaurantEntity())
+                .managerEntity(reservationEntity.getManagerEntity())
+                .rating(reviewDto.getRating().getRateValue())
+                .build();
+    }
 }

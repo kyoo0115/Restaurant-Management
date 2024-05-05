@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.restaurantmanagement.entity.ReservationEntity;
-import project.restaurantmanagement.model.Constants.ReservationStatus;
+import project.restaurantmanagement.model.Type.ReservationStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;

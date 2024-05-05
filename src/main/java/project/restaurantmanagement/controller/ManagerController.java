@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import project.restaurantmanagement.dto.*;
-import project.restaurantmanagement.model.Constants.AcceptStatus;
+import project.restaurantmanagement.model.Type.AcceptStatus;
 import project.restaurantmanagement.service.ManagerService;
 
 import java.util.List;

@@ -3,7 +3,7 @@ package project.restaurantmanagement.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import project.restaurantmanagement.model.Constants.UserType;
+import project.restaurantmanagement.model.Type.UserType;
 
 public class SignInDto {
 

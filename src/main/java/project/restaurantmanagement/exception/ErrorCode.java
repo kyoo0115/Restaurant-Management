@@ -33,12 +33,11 @@ public enum ErrorCode {
     VISIT_DATETIME_EARLY("방문 시간이 예약 시간보다 너무 빠릅니다."),
 
     REVIEW_ALREADY_EXIST("해당 예약에 대한 리뷰가 이미 존재합니다."),
+    REVIEW_NOT_YOURS("해당 예약에 대한 리뷰가 본인 것이 아닙니다."),
     CANT_POST_REVIEW("조건을 만족하지 않아 리뷰를 작성할 수 없습니다(리뷰는 가게를 방문해야 작성 가능합니다)."),
 
     SHOP_MANAGER_NOT_EXIST("해당 매장의 점장 유저 정보가 존재하지 않습니다."),
-    RESERVATION_CUSTOMER_NOT_EXIST("해당 예약의 고객 유저 정보가 존재하지 않습니다."),
-
-    ;
+    RESERVATION_CUSTOMER_NOT_EXIST("해당 예약의 고객 유저 정보가 존재하지 않습니다.");
 
     private String description;
 }

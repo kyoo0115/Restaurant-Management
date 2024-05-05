@@ -8,7 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
-import project.restaurantmanagement.model.Constants.UserType;
+import project.restaurantmanagement.model.Type.UserType;
 import project.restaurantmanagement.service.CustomerService;
 import project.restaurantmanagement.service.ManagerService;
 

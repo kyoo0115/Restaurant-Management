@@ -13,9 +13,10 @@ import project.restaurantmanagement.entity.CustomerEntity;
 import project.restaurantmanagement.entity.ReservationEntity;
 import project.restaurantmanagement.entity.RestaurantEntity;
 import project.restaurantmanagement.entity.ReviewEntity;
+import project.restaurantmanagement.exception.ReservationServiceException;
 import project.restaurantmanagement.exception.impl.AlreadyExistUserException;
 import project.restaurantmanagement.exception.impl.IncorrectPasswordException;
-import project.restaurantmanagement.model.Constants.ReservationStatus;
+import project.restaurantmanagement.model.Type.ReservationStatus;
 import project.restaurantmanagement.repository.CustomerRepository;
 import project.restaurantmanagement.repository.ReservationRepository;
 import project.restaurantmanagement.repository.RestaurantRepository;
@@ -23,6 +24,10 @@ import project.restaurantmanagement.repository.ReviewRepository;
 import project.restaurantmanagement.security.TokenProvider;
 
 import java.util.List;
+import java.util.Objects;
+
+import static project.restaurantmanagement.exception.ErrorCode.*;
+import static project.restaurantmanagement.model.Type.ReservationStatus.COMPLETED;
 
 @Slf4j
 @Service
@@ -38,17 +43,14 @@ public class CustomerService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return customerRepository.findByEmail(username).orElseThrow(
-                () -> new UsernameNotFoundException(
-                        "No such email -> " + username
-                )
-        );
+        return customerRepository.findByEmail(username)
+                .orElseThrow(() -> new ReservationServiceException(USER_NOT_EXIST));
     }
 
     @Transactional
     public SignUpDto.Response register(SignUpDto.Request signUpRequest) {
         if (customerRepository.existsByEmail(signUpRequest.getEmail())) {
-            throw new AlreadyExistUserException();
+            throw new ReservationServiceException(EMAIL_ALREADY_EXIST);
         }
 
         log.info("register user -> {}", signUpRequest.getEmail());
@@ -67,7 +69,7 @@ public class CustomerService implements UserDetailsService {
     @Transactional
     public SignInDto.Response authenticate(SignInDto.Request signInRequest) {
         CustomerEntity customer = customerRepository.findByEmail(signInRequest.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + signInRequest.getEmail()));
+                .orElseThrow(() -> new ReservationServiceException(USER_NOT_EXIST));
 
         if (!passwordEncoder.matches(signInRequest.getPassword(), customer.getPassword())) {
             throw new IncorrectPasswordException();
@@ -96,9 +98,9 @@ public class CustomerService implements UserDetailsService {
         long customerId = tokenProvider.getId(token);
 
         CustomerEntity customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ReservationServiceException(USER_NOT_EXIST));
         RestaurantEntity restaurant = restaurantRepository.findById(request.getRestaurantId())
-                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+                .orElseThrow(() -> new ReservationServiceException(RESTAURANT_NOT_EXIST));
 
         ReservationEntity reservationEntity = ReservationEntity.of(request, customer, restaurant);
 
@@ -108,19 +110,80 @@ public class CustomerService implements UserDetailsService {
     }
 
     @Transactional
-    public void visitedRestaurant(Long reservationId) {
+    public String visitRestaurant(VisitRestaurantDto request, Long reservationId, String header) {
+        String token = tokenProvider.getToken(header);
+        Long customerId = tokenProvider.getId(token);
+
+        CustomerEntity customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new ReservationServiceException(USER_NOT_EXIST));
+
         ReservationEntity reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new RuntimeException("Reservation not found"));
-        reservation.setStatus(ReservationStatus.COMPLETED);
+                .orElseThrow(() -> new ReservationServiceException(RESERVATION_NOT_EXIST));
+
+        // 방문자랑 예약자 확인
+        checkVisitForm(customer, request);
+        // 예약 승인 되었는지 확인
+        checkReservation(reservation);
+
+        reservation.setStatus(COMPLETED);
         reservation.setVisited(true);
         reservationRepository.save(reservation);
+
+        return "예약 방문 처리가 완료되었습니다.";
     }
 
+    @Transactional
+    public String addReview(ReviewDto request, Long reservationId, String header) {
+        String token = tokenProvider.getToken(header);
+        Long customerId = tokenProvider.getId(token);
 
+        CustomerEntity customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new ReservationServiceException(RESERVATION_CUSTOMER_NOT_EXIST));
 
-//    @Transactional
-//    public void addReview(ReviewDto request, Long restaurantId) {
-//        log.info("add review -> {}", request.getComments());
-//        reviewRepository.save(ReviewEntity)
-//    }
+        ReservationEntity reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new ReservationServiceException(RESERVATION_NOT_EXIST));
+
+        // 리뷰 작성은 예약이 완료된 후에만 가능
+        if(!Objects.equals(reservation.getCustomerEntity().getId(), customer.getId())) {
+            throw new ReservationServiceException(REVIEW_NOT_YOURS);
+        }
+
+        if(reservation.getStatus() != COMPLETED) {
+            throw new ReservationServiceException(RESERVATION_NOT_PROCESSED);
+        }
+
+        log.info("add review -> {}", request.getComments());
+        reviewRepository.save(ReviewEntity.of(request, customer, reservation));
+        return "해당 식당 " + "[" + reservation.getRestaurantEntity().getName() + "]" + "의 리뷰 남겼습니다";
+    }
+
+    /**
+     * 예약 정보와 방문자가 입력한 정보 체크
+     * <p>
+     * (두 가지 다 일치해야 방문 확인 가능)
+     */
+    private void checkVisitForm(CustomerEntity customer, VisitRestaurantDto form) {
+        if (!customer.getName().equals(form.getName()) ||
+                !customer.getPhoneNumber().equals(form.getPhoneNumber())
+        ) {
+            throw new ReservationServiceException(WRONG_VISIT_FORM);
+        }
+    }
+
+    private void checkReservation(ReservationEntity reservation) {
+        // 이미 취소된 예약인 경우
+        if (reservation.getStatus() == ReservationStatus.CANCELLED) {
+            throw new ReservationServiceException(RESERVATION_ALREADY_CANCELED);
+        }
+
+        // 이미 완료 처리된 예약인 경우
+        if (reservation.getStatus() == COMPLETED) {
+            throw new ReservationServiceException(RESERVATION_ALREADY_VISITED);
+        }
+
+        // 아직 승인이 된 예약이 아닌 경우
+        if(reservation.getStatus() == ReservationStatus.PENDING) {
+            throw new ReservationServiceException(RESERVATION_NOT_PROCESSED);
+        }
+    }
 }
