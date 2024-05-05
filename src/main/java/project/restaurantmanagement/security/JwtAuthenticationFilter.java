@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import project.restaurantmanagement.model.Constants.UserType;
 
 import java.io.IOException;
 

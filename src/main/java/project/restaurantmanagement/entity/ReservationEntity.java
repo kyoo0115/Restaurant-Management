@@ -37,6 +37,7 @@ public class ReservationEntity extends BaseEntity {
 
     private Integer peopleCount;
     private LocalDateTime reservationTime;
+    private boolean visited;
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
@@ -48,6 +49,7 @@ public class ReservationEntity extends BaseEntity {
                 .restaurantEntity(restaurant)
                 .peopleCount(request.getPeopleCount())
                 .reservationTime(request.getReservationTime())
+                .visited(false)
                 .status(ReservationStatus.PENDING)
                 .build();
     }

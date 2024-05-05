@@ -4,13 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import project.restaurantmanagement.dto.RegisterReservationDto;
-import project.restaurantmanagement.dto.SignInDto;
-import project.restaurantmanagement.dto.SignUpDto;
-import project.restaurantmanagement.security.TokenProvider;
 import project.restaurantmanagement.service.CustomerService;
 
 @RestController
@@ -20,6 +15,7 @@ import project.restaurantmanagement.service.CustomerService;
 public class CustomerController {
 
     private final CustomerService customerService;
+    private static final String AUTH_HEADER = "Authorization";
 
     @GetMapping("/view-restaurants")
     public ResponseEntity<?> viewRestaurants() {
@@ -31,10 +27,9 @@ public class CustomerController {
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<?> createReservation(
             @RequestBody RegisterReservationDto registerDto,
-            @RequestHeader("Authorization") String token) {
+            @RequestHeader(name = AUTH_HEADER) String token) {
 
         var result = this.customerService.createReservation(registerDto, token);
         return ResponseEntity.ok(result);
     }
-
 }

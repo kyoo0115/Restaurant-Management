@@ -112,6 +112,7 @@ public class CustomerService implements UserDetailsService {
         ReservationEntity reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RuntimeException("Reservation not found"));
         reservation.setStatus(ReservationStatus.COMPLETED);
+        reservation.setVisited(true);
         reservationRepository.save(reservation);
     }
 

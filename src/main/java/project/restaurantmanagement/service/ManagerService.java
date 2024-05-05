@@ -12,15 +12,19 @@ import project.restaurantmanagement.dto.*;
 import project.restaurantmanagement.entity.ManagerEntity;
 import project.restaurantmanagement.entity.ReservationEntity;
 import project.restaurantmanagement.entity.RestaurantEntity;
+import project.restaurantmanagement.exception.ReservationServiceException;
 import project.restaurantmanagement.exception.impl.AlreadyExistUserException;
 import project.restaurantmanagement.exception.impl.IncorrectPasswordException;
-import project.restaurantmanagement.model.Constants.ReservationStatus;
+import project.restaurantmanagement.model.Constants.AcceptStatus;
 import project.restaurantmanagement.repository.ManagerRepository;
 import project.restaurantmanagement.repository.ReservationRepository;
 import project.restaurantmanagement.repository.RestaurantRepository;
 import project.restaurantmanagement.security.TokenProvider;
 
 import java.util.List;
+
+import static project.restaurantmanagement.exception.ErrorCode.*;
+import static project.restaurantmanagement.model.Constants.ReservationStatus.*;
 
 @Slf4j
 @Service
@@ -110,8 +114,11 @@ public class ManagerService implements UserDetailsService {
         return ReservationDto.from(reservationRepository.findReservationEntitiesByManagerEntity(manager));
     }
 
+    /**
+     * 예약 정보를 이용하여 예약 승인/거절 결정
+     */
     @Transactional
-    public void acceptReservation(String header, Long reservationId) {
+    public String acceptOrRefuseReservation(String header, Long reservationId, AcceptStatus acceptStatus) {
 
         String token = tokenProvider.getToken(header);
         Long managerId = tokenProvider.getId(token);
@@ -120,33 +127,34 @@ public class ManagerService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("Manager not found: " + managerId));
 
         ReservationEntity reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new UsernameNotFoundException("Reservation not found: " + reservationId));
+                .orElseThrow(() -> new ReservationServiceException(RESERVATION_NOT_EXIST));
 
-        if (!reservation.getRestaurantEntity().getManagerEntity().equals(manager)) {
-            throw new SecurityException("Unauthorized access: Manager does not manage this restaurant");
-        }
+        checkReservation(reservation);
 
-        reservation.setStatus(ReservationStatus.ACCEPTED);
+        reservation.setStatus(acceptStatus.getStatus() ? ACCEPTED : CANCELLED);
+
         reservationRepository.save(reservation);
+
+        return "예약 번호 " + reservationId + "에 대한 " + (acceptStatus.getStatus() ? "승인" : "거절") + " 처리가 완료되었습니다.";
     }
 
-    @Transactional
-    public void cancelReservation(String header, Long reservationId) {
-
-        String token = tokenProvider.getToken(header);
-        Long managerId = tokenProvider.getId(token);
-
-        ManagerEntity manager = managerRepository.findById(managerId)
-                .orElseThrow(() -> new UsernameNotFoundException("Manager not found: " + managerId));
-
-        ReservationEntity reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new UsernameNotFoundException("Reservation not found: " + reservationId));
-
-        if (!reservation.getRestaurantEntity().getManagerEntity().equals(manager)) {
-            throw new SecurityException("Unauthorized access: Manager does not manage this restaurant");
+    /**
+     * 예약 검증
+     */
+    private void checkReservation(ReservationEntity reservation) {
+        // 이미 취소된 예약인 경우
+        if (reservation.getStatus() == CANCELLED) {
+            throw new ReservationServiceException(RESERVATION_ALREADY_CANCELED);
         }
 
-        reservation.setStatus(ReservationStatus.CANCELLED);
-        reservationRepository.save(reservation);
+        // 이미 완료 처리된 예약인 경우
+        if (reservation.getStatus() == COMPLETED) {
+            throw new ReservationServiceException(RESERVATION_ALREADY_VISITED);
+        }
+
+        // 이미 확인(승인)한 예약인 경우
+        if (reservation.getStatus() == ACCEPTED) {
+            throw new ReservationServiceException(RESERVATION_ALREADY_PROCESSED);
+        }
     }
 }

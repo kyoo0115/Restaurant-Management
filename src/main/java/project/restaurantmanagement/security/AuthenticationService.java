@@ -12,8 +12,6 @@ import project.restaurantmanagement.model.Constants.UserType;
 import project.restaurantmanagement.service.CustomerService;
 import project.restaurantmanagement.service.ManagerService;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 @Component
 @Slf4j
