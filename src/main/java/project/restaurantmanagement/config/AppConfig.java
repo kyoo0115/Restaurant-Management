@@ -12,12 +12,4 @@ public class AppConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-    /**
-     * Authorization HTTP header Bean
-     */
-    @Bean
-    public String getAuthHeader() {
-        return "Authorization";
-    }
 }
