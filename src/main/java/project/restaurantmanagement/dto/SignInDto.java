@@ -1,7 +1,6 @@
 package project.restaurantmanagement.dto;
 
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import project.restaurantmanagement.model.Constants.UserType;

@@ -5,6 +5,7 @@ import lombok.*;
 /**
  * 매장 정보 등록 DTO
  */
+
 @Getter
 @Builder
 @NoArgsConstructor

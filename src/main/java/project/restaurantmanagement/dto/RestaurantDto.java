@@ -8,6 +8,7 @@ import java.util.List;
 /**
  * 매장 정보 DTO
  */
+
 @Getter
 @Builder
 @NoArgsConstructor
