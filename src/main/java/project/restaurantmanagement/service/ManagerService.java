@@ -12,16 +12,17 @@ import project.restaurantmanagement.dto.*;
 import project.restaurantmanagement.entity.ManagerEntity;
 import project.restaurantmanagement.entity.ReservationEntity;
 import project.restaurantmanagement.entity.RestaurantEntity;
-import project.restaurantmanagement.exception.ReservationServiceException;
-import project.restaurantmanagement.exception.impl.AlreadyExistUserException;
-import project.restaurantmanagement.exception.impl.IncorrectPasswordException;
+import project.restaurantmanagement.entity.ReviewEntity;
+import project.restaurantmanagement.exception.GlobalException;
 import project.restaurantmanagement.model.Type.AcceptStatus;
 import project.restaurantmanagement.repository.ManagerRepository;
 import project.restaurantmanagement.repository.ReservationRepository;
 import project.restaurantmanagement.repository.RestaurantRepository;
+import project.restaurantmanagement.repository.ReviewRepository;
 import project.restaurantmanagement.security.TokenProvider;
 
 import java.util.List;
+import java.util.Objects;
 
 import static project.restaurantmanagement.exception.ErrorCode.*;
 import static project.restaurantmanagement.model.Type.ReservationStatus.*;
@@ -36,18 +37,18 @@ public class ManagerService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final ReservationRepository reservationRepository;
+    private final ReviewRepository reviewRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return managerRepository.findByEmail(username).orElseThrow(
-                () -> new UsernameNotFoundException(
-                        "No such email -> " + username));
+                () -> new GlobalException(USER_NOT_EXIST));
     }
 
     @Transactional
     public SignUpDto.Response register(SignUpDto.Request signUpRequest) {
         if (managerRepository.existsByEmail(signUpRequest.getEmail())) {
-            throw new AlreadyExistUserException();
+            throw new GlobalException(USER_NOT_EXIST);
         }
 
         log.info("register user -> {}", signUpRequest.getEmail());
@@ -69,7 +70,7 @@ public class ManagerService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + signInRequest.getEmail()));
 
         if (!passwordEncoder.matches(signInRequest.getPassword(), managerEntity.getPassword())) {
-            throw new IncorrectPasswordException();
+            throw new GlobalException(WRONG_PASSWORD);
         }
 
         String token = tokenProvider.generateToken(managerEntity.getId(), managerEntity.getEmail(), managerEntity.getUserType());
@@ -88,7 +89,7 @@ public class ManagerService implements UserDetailsService {
         String email = tokenProvider.getUsername(token);
 
         ManagerEntity manager = managerRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Manager not found: " + email));
+                .orElseThrow(() -> new GlobalException(MANAGER_NOT_EXIST));
 
         RestaurantEntity savedRestaurant = restaurantRepository.save(RestaurantEntity.of(registerRestaurantDto, manager));
 
@@ -102,13 +103,13 @@ public class ManagerService implements UserDetailsService {
         Long managerId = tokenProvider.getId(token);
 
         ManagerEntity manager = managerRepository.findById(managerId)
-                .orElseThrow(() -> new UsernameNotFoundException("Manager not found: " + managerId));
+                .orElseThrow(() -> new GlobalException(MANAGER_NOT_EXIST));
 
         RestaurantEntity restaurant = restaurantRepository.findById(restaurantId)
-                .orElseThrow(() -> new UsernameNotFoundException("Restaurant not found: " + restaurantId));
+                .orElseThrow(() -> new GlobalException(RESTAURANT_NOT_EXIST));
 
         if (!manager.getRestaurants().contains(restaurant)) {
-            throw new UsernameNotFoundException("Restaurant not found: " + restaurantId);
+            throw new GlobalException(SHOP_MANAGER_NOT_EXIST);
         }
 
         return ReservationDto.from(reservationRepository.findReservationEntitiesByManagerEntity(manager));
@@ -124,10 +125,10 @@ public class ManagerService implements UserDetailsService {
         Long managerId = tokenProvider.getId(token);
 
         ManagerEntity manager = managerRepository.findById(managerId)
-                .orElseThrow(() -> new UsernameNotFoundException("Manager not found: " + managerId));
+                .orElseThrow(() -> new GlobalException(MANAGER_NOT_EXIST));
 
         ReservationEntity reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new ReservationServiceException(RESERVATION_NOT_EXIST));
+                .orElseThrow(() -> new GlobalException(RESERVATION_NOT_EXIST));
 
         checkReservation(reservation);
 
@@ -138,23 +139,43 @@ public class ManagerService implements UserDetailsService {
         return "예약 번호 " + reservationId + "에 대한 " + (acceptStatus.getStatus() ? "승인" : "거절") + " 처리가 완료되었습니다.";
     }
 
+    @Transactional
+    public String deleteReview(String header, Long reviewId) {
+
+        String token = tokenProvider.getToken(header);
+        Long managerId = tokenProvider.getId(token);
+
+        ManagerEntity manager = managerRepository.findById(managerId)
+                .orElseThrow(() -> new GlobalException(MANAGER_NOT_EXIST));
+
+        ReviewEntity review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new GlobalException(REVIEW_NOT_EXIST));
+
+        if (!Objects.equals(review.getManagerEntity().getId(), manager.getId())) {
+            throw new GlobalException(REVIEW_NOT_YOURS);
+        }
+
+        reviewRepository.deleteById(reviewId);
+        return "리뷰가 성공적으로 삭제되었습니다. [" + review.getRestaurantEntity().getName() + "]";
+    }
+
     /**
      * 예약 검증
      */
     private void checkReservation(ReservationEntity reservation) {
         // 이미 취소된 예약인 경우
         if (reservation.getStatus() == CANCELLED) {
-            throw new ReservationServiceException(RESERVATION_ALREADY_CANCELED);
+            throw new GlobalException(RESERVATION_ALREADY_CANCELED);
         }
 
         // 이미 완료 처리된 예약인 경우
         if (reservation.getStatus() == COMPLETED) {
-            throw new ReservationServiceException(RESERVATION_ALREADY_VISITED);
+            throw new GlobalException(RESERVATION_ALREADY_VISITED);
         }
 
         // 이미 확인(승인)한 예약인 경우
         if (reservation.getStatus() == ACCEPTED) {
-            throw new ReservationServiceException(RESERVATION_ALREADY_PROCESSED);
+            throw new GlobalException(RESERVATION_ALREADY_PROCESSED);
         }
     }
 }

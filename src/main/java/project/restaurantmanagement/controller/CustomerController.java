@@ -57,4 +57,25 @@ public class CustomerController {
         String result = this.customerService.addReview(request, reservationId, header);
         return ResponseEntity.ok(result);
     }
+
+    @PatchMapping("/review/{reviewId}")
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public ResponseEntity<?> updateReview(@RequestBody ReviewDto request,
+                                          @PathVariable Long reviewId,
+                                          @RequestHeader(name = AUTH_HEADER) String header) {
+
+        log.info("update review");
+        String result = this.customerService.updateReview(request, reviewId, header);
+        return ResponseEntity.ok(result);
+    }
+
+    @DeleteMapping("/review/{reviewId}")
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public ResponseEntity<?> deleteReview(@PathVariable Long reviewId,
+                                          @RequestHeader(name = AUTH_HEADER) String header) {
+
+        log.info("delete review");
+        String result = this.customerService.deleteReview(reviewId, header);
+        return ResponseEntity.ok(result);
+    }
 }

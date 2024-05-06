@@ -5,6 +5,7 @@ import lombok.*;
 /**
  * 고객 방문 확인을 위한 DTO
  */
+
 @Getter
 @Setter
 @NoArgsConstructor

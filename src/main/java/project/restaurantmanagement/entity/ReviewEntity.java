@@ -9,6 +9,7 @@ import static jakarta.persistence.FetchType.LAZY;
 @Entity
 @Table(name = "review")
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 /**
  * 리뷰 평점(1~5)
  */
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

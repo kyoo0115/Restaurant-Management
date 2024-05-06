@@ -15,29 +15,22 @@ public enum ErrorCode {
     WRONG_PASSWORD("비밀번호가 일치하지 않습니다."),
 
     USER_NOT_EXIST("해당 유저가 존재하지 않습니다."),
+    CUSTOMER_NOT_EXIST("해당 고객은 존재하지 않습니다."),
+    MANAGER_NOT_EXIST("해당 점장은 존재하지 않습니다."),
     RESTAURANT_NOT_EXIST("해당 매장이 존재하지 않습니다."),
     RESERVATION_NOT_EXIST("해당 예약이 존재하지 않습니다."),
+    REVIEW_NOT_EXIST("해당 리뷰이 존재하지 않습니다."),
 
-    RESERVATION_ALREADY_EXIST("해당 날짜와 시간에 이미 예약이 존재합니다."),
-    RESERVATION_DATETIME_OVER("예약 가능 날짜 및 시간을 초과했습니다."),
     RESERVATION_WRONG_CUSTOMER("예약 고객 정보가 일치하지 않습니다."),
-    RESERVATION_NO_CHANGE("변경된 예약 정보가 없습니다."),
     RESERVATION_ALREADY_CANCELED("이미 취소 처리된 예약입니다."),
     RESERVATION_ALREADY_VISITED("이미 방문 처리된 예약입니다."),
-    RESERVATION_ALREADY_REFUSED("이미 거절 처리된 예약입니다."),
     RESERVATION_ALREADY_PROCESSED("이미 승인/거절 처리된 예약입니다."),
     RESERVATION_NOT_PROCESSED("예약이 아직 승인/거절 처리되지 않았습니다."),
 
-    WRONG_VISIT_FORM("방문자 정보가 일치하지 않습니다."),
-    VISIT_DATETIME_OVER("방문 시간이 예약 시간을 초과했습니다."),
-    VISIT_DATETIME_EARLY("방문 시간이 예약 시간보다 너무 빠릅니다."),
-
-    REVIEW_ALREADY_EXIST("해당 예약에 대한 리뷰가 이미 존재합니다."),
     REVIEW_NOT_YOURS("해당 예약에 대한 리뷰가 본인 것이 아닙니다."),
     CANT_POST_REVIEW("조건을 만족하지 않아 리뷰를 작성할 수 없습니다(리뷰는 가게를 방문해야 작성 가능합니다)."),
 
-    SHOP_MANAGER_NOT_EXIST("해당 매장의 점장 유저 정보가 존재하지 않습니다."),
-    RESERVATION_CUSTOMER_NOT_EXIST("해당 예약의 고객 유저 정보가 존재하지 않습니다.");
+    SHOP_MANAGER_NOT_EXIST("해당 매장의 점장 유저 정보가 존재하지 않습니다.");
 
     private String description;
 }

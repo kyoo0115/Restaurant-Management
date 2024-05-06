@@ -55,4 +55,13 @@ public class ManagerController {
         log.info("decline reservation -> {} ", reservationId);
         return ResponseEntity.ok(managerService.acceptOrRefuseReservation(header, reservationId, AcceptStatus.REFUSE));
     }
+
+    @PreAuthorize("hasRole('MANAGER')")
+    @DeleteMapping("/review/{reviewId}")
+    public ResponseEntity<?> deleteReview(@RequestHeader(name = AUTH_HEADER) String header,
+                                          @PathVariable Long reviewId) {
+
+        log.info("delete review -> {} ", reviewId);
+        return ResponseEntity.ok(managerService.deleteReview(header, reviewId));
+    }
 }
