@@ -19,4 +19,13 @@ public enum Rating {
     STAR_5(5.0);
 
     private Double rateValue;
+
+    public static Rating fromValue(double value) {
+        for (Rating rating : Rating.values()) {
+            if (rating.getRateValue() == value) {
+                return rating;
+            }
+        }
+        throw new IllegalArgumentException("Unknown rating value: " + value);
+    }
 }

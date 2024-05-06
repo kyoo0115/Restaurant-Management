@@ -10,6 +10,10 @@ import project.restaurantmanagement.dto.ReviewDto;
 import project.restaurantmanagement.dto.VisitRestaurantDto;
 import project.restaurantmanagement.service.CustomerService;
 
+/**
+ * 고객 관련 요청을 처리하는 컨트롤러입니다.
+ */
+
 @RestController
 @RequestMapping("/customer")
 @RequiredArgsConstructor
@@ -19,6 +23,9 @@ public class CustomerController {
     private final CustomerService customerService;
     private static final String AUTH_HEADER = "Authorization";
 
+    /**
+     * 모든 식당 조회
+     */
     @GetMapping("/view-restaurants")
     public ResponseEntity<?> viewRestaurants() {
         log.info("view restaurants");
@@ -26,6 +33,9 @@ public class CustomerController {
         return ResponseEntity.ok(result);
     }
 
+    /**
+     * 신규 예약 생성
+     */
     @PostMapping("/create-reservation")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<?> createReservation(@RequestBody RegisterReservationDto registerDto,
@@ -36,6 +46,9 @@ public class CustomerController {
         return ResponseEntity.ok(result);
     }
 
+    /**
+     * 식당 방문 확인
+     */
     @PostMapping("/visit-restaurant/{restaurantId}")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<?> visitRestaurant(@RequestBody VisitRestaurantDto request,
@@ -47,6 +60,9 @@ public class CustomerController {
         return ResponseEntity.ok(result);
     }
 
+    /**
+     * 예약에 대한 리뷰 추가
+     */
     @PostMapping("/review/{reservationId}")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<?> addReview(@RequestBody ReviewDto request,
@@ -58,6 +74,9 @@ public class CustomerController {
         return ResponseEntity.ok(result);
     }
 
+    /**
+     * 리뷰 업데이트
+     */
     @PatchMapping("/review/{reviewId}")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<?> updateReview(@RequestBody ReviewDto request,
@@ -69,6 +88,9 @@ public class CustomerController {
         return ResponseEntity.ok(result);
     }
 
+    /**
+     * 리뷰 삭제
+     */
     @DeleteMapping("/review/{reviewId}")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<?> deleteReview(@PathVariable Long reviewId,

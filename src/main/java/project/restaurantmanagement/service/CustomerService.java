@@ -26,6 +26,11 @@ import java.util.Objects;
 import static project.restaurantmanagement.exception.ErrorCode.*;
 import static project.restaurantmanagement.model.Type.ReservationStatus.*;
 
+/**
+ * 회원 관련 서비스를 제공하는 클래스입니다.
+ * 회원의 등록, 인증, 리뷰 및 예약 관리 등을 수행합니다.
+ */
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -38,12 +43,19 @@ public class CustomerService implements UserDetailsService {
     private final ReviewRepository reviewRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * 사용자 이름(이메일)을 바탕으로 사용자 세부 정보를 로드합니다.
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return customerRepository.findByEmail(username)
                 .orElseThrow(() -> new GlobalException(USER_NOT_EXIST));
     }
 
+    /**
+     * 신규 사용자 등록
+     * 비밀번호 암호화 및 사용자 정보 저장
+     */
     @Transactional
     public SignUpDto.Response register(SignUpDto.Request signUpRequest) {
         if (customerRepository.existsByEmail(signUpRequest.getEmail())) {
@@ -63,6 +75,10 @@ public class CustomerService implements UserDetailsService {
                 .build();
     }
 
+    /**
+     * 사용자 인증 처리
+     * 이메일과 비밀번호를 통해 사용자를 인증하고 토큰 발행
+     */
     @Transactional
     public SignInDto.Response authenticate(SignInDto.Request signInRequest) {
         CustomerEntity customer = customerRepository.findByEmail(signInRequest.getEmail())
@@ -81,6 +97,10 @@ public class CustomerService implements UserDetailsService {
                 .build();
     }
 
+    /**
+     * 매장 목록 조회
+     * 모든 매장 정보를 조회하여 반환
+     */
     @Transactional
     public List<RestaurantDto> viewRestaurants() {
         log.info("view restaurants");
@@ -88,6 +108,10 @@ public class CustomerService implements UserDetailsService {
         return RestaurantDto.from(restaurantEntities);
     }
 
+    /**
+     * 예약 생성
+     * 사용자 인증 후 예약 정보 저장
+     */
     @Transactional
     public ReservationDto createReservation(RegisterReservationDto request, String header) {
         log.info("Creating reservation at {}", request.getReservationTime());
@@ -106,6 +130,10 @@ public class CustomerService implements UserDetailsService {
         return ReservationDto.from(savedEntity);
     }
 
+    /**
+     * 방문 확인 처리
+     * 예약 정보와 방문자 정보가 일치해야만 방문 처리 가능
+     */
     @Transactional
     public String visitRestaurant(VisitRestaurantDto request, Long reservationId, String header) {
         String token = tokenProvider.getToken(header);
@@ -129,6 +157,10 @@ public class CustomerService implements UserDetailsService {
         return "예약 방문 처리가 완료되었습니다.";
     }
 
+    /**
+     * 리뷰 추가
+     * 예약이 완료된 후에만 리뷰 작성 가능
+     */
     @Transactional
     public String addReview(ReviewDto request, Long reservationId, String header) {
         String token = tokenProvider.getToken(header);
@@ -154,6 +186,10 @@ public class CustomerService implements UserDetailsService {
         return "해당 식당 " + "[" + reservation.getRestaurantEntity().getName() + "]" + "의 리뷰 남겼습니다";
     }
 
+    /**
+     * 리뷰 수정
+     * 예약이 완료된 후에만 리뷰 수정 가능
+     */
     @Transactional
     public String updateReview(ReviewDto request, Long reviewId, String header) {
         String token = tokenProvider.getToken(header);
@@ -179,6 +215,10 @@ public class CustomerService implements UserDetailsService {
         return "리뷰가 성공적으로 업데이트되었습니다. [" + review.getRestaurantEntity().getName() + "]";
     }
 
+    /**
+     * 리뷰 삭제
+     * 예약이 완료된 후에만 리뷰 삭제 가능
+     */
     @Transactional
     public String deleteReview(Long reviewId, String header) {
 
@@ -202,7 +242,6 @@ public class CustomerService implements UserDetailsService {
 
     /**
      * 예약 정보와 방문자가 입력한 정보 체크
-     * <p>
      * (두 가지 다 일치해야 방문 확인 가능)
      */
     private void checkVisitForm(CustomerEntity customer, VisitRestaurantDto form) {

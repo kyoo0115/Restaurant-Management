@@ -1,6 +1,9 @@
 package project.restaurantmanagement.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import project.restaurantmanagement.entity.RestaurantEntity;
 
 import java.util.List;

@@ -1,6 +1,9 @@
 package project.restaurantmanagement.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * 매장 정보 등록 DTO

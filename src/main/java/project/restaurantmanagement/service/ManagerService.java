@@ -27,6 +27,11 @@ import java.util.Objects;
 import static project.restaurantmanagement.exception.ErrorCode.*;
 import static project.restaurantmanagement.model.Type.ReservationStatus.*;
 
+/**
+ * 매니저 관련 서비스를 제공하는 클래스입니다.
+ * 매니저의 등록, 인증, 매장 및 예약 관리 등을 수행합니다.
+ */
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -39,12 +44,19 @@ public class ManagerService implements UserDetailsService {
     private final ReservationRepository reservationRepository;
     private final ReviewRepository reviewRepository;
 
+    /**
+     * 사용자 이름(이메일)을 바탕으로 사용자 세부 정보를 로드합니다.
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return managerRepository.findByEmail(username).orElseThrow(
                 () -> new GlobalException(USER_NOT_EXIST));
     }
 
+    /**
+     * 신규 매니저 등록
+     * 비밀번호는 암호화하여 저장합니다.
+     */
     @Transactional
     public SignUpDto.Response register(SignUpDto.Request signUpRequest) {
         if (managerRepository.existsByEmail(signUpRequest.getEmail())) {
@@ -64,6 +76,9 @@ public class ManagerService implements UserDetailsService {
                 .build();
     }
 
+    /**
+     * 매니저 로그인 및 토큰 발행
+     */
     @Transactional
     public SignInDto.Response authenticate(SignInDto.Request signInRequest) {
         ManagerEntity managerEntity = managerRepository.findByEmail(signInRequest.getEmail())
@@ -82,6 +97,9 @@ public class ManagerService implements UserDetailsService {
                 .build();
     }
 
+    /**
+     * 매니저가 관리하는 매장 생성
+     */
     @Transactional
     public RestaurantDto createRestaurant(RegisterRestaurantDto registerRestaurantDto, String header) {
 
@@ -96,6 +114,9 @@ public class ManagerService implements UserDetailsService {
         return RestaurantDto.from(savedRestaurant);
     }
 
+    /**
+     * 매니저 별 예약 정보 조회
+     */
     @Transactional
     public List<ReservationDto> viewReservations(String header, Long restaurantId) {
 
@@ -139,6 +160,30 @@ public class ManagerService implements UserDetailsService {
         return "예약 번호 " + reservationId + "에 대한 " + (acceptStatus.getStatus() ? "승인" : "거절") + " 처리가 완료되었습니다.";
     }
 
+    /**
+     * 리뷰 조회
+     */
+    @Transactional
+    public List<ReviewDto> viewReviews(String header, Long restaurantId) {
+        String token = tokenProvider.getToken(header);
+        Long managerId = tokenProvider.getId(token);
+
+        ManagerEntity manager = managerRepository.findById(managerId)
+                .orElseThrow(() -> new GlobalException(MANAGER_NOT_EXIST));
+
+        RestaurantEntity restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new GlobalException(RESTAURANT_NOT_EXIST));
+
+        if (!manager.getRestaurants().contains(restaurant)) {
+            throw new GlobalException(SHOP_MANAGER_NOT_EXIST);
+        }
+
+        return ReviewDto.from(reviewRepository.findReviewEntitiesByRestaurantEntity(restaurant));
+    }
+
+    /**
+     * 리뷰 삭제
+     */
     @Transactional
     public String deleteReview(String header, Long reviewId) {
 
