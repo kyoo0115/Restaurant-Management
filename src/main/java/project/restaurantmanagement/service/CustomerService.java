@@ -12,16 +12,11 @@ import project.restaurantmanagement.dto.*;
 import project.restaurantmanagement.entity.CustomerEntity;
 import project.restaurantmanagement.entity.ReservationEntity;
 import project.restaurantmanagement.entity.RestaurantEntity;
-import project.restaurantmanagement.entity.ReviewEntity;
 import project.restaurantmanagement.exception.GlobalException;
 import project.restaurantmanagement.repository.CustomerRepository;
 import project.restaurantmanagement.repository.ReservationRepository;
 import project.restaurantmanagement.repository.RestaurantRepository;
-import project.restaurantmanagement.repository.ReviewRepository;
 import project.restaurantmanagement.security.TokenProvider;
-
-import java.util.List;
-import java.util.Objects;
 
 import static project.restaurantmanagement.exception.ErrorCode.*;
 import static project.restaurantmanagement.model.Type.ReservationStatus.*;
@@ -40,7 +35,6 @@ public class CustomerService implements UserDetailsService {
     private final RestaurantRepository restaurantRepository;
     private final ReservationRepository reservationRepository;
     private final TokenProvider tokenProvider;
-    private final ReviewRepository reviewRepository;
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -98,17 +92,6 @@ public class CustomerService implements UserDetailsService {
     }
 
     /**
-     * 매장 목록 조회
-     * 모든 매장 정보를 조회하여 반환
-     */
-    @Transactional
-    public List<RestaurantDto> viewRestaurants() {
-        log.info("view restaurants");
-        List<RestaurantEntity> restaurantEntities = restaurantRepository.findAll();
-        return RestaurantDto.from(restaurantEntities);
-    }
-
-    /**
      * 예약 생성
      * 사용자 인증 후 예약 정보 저장
      */
@@ -155,89 +138,6 @@ public class CustomerService implements UserDetailsService {
         reservationRepository.save(reservation);
 
         return "예약 방문 처리가 완료되었습니다.";
-    }
-
-    /**
-     * 리뷰 추가
-     * 예약이 완료된 후에만 리뷰 작성 가능
-     */
-    @Transactional
-    public String addReview(ReviewDto request, Long reservationId, String header) {
-        String token = tokenProvider.getToken(header);
-        Long customerId = tokenProvider.getId(token);
-
-        CustomerEntity customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new GlobalException(CUSTOMER_NOT_EXIST));
-
-        ReservationEntity reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new GlobalException(RESERVATION_NOT_EXIST));
-
-        // 리뷰 작성은 예약이 완료된 후에만 가능
-        if(!Objects.equals(reservation.getCustomerEntity().getId(), customer.getId())) {
-            throw new GlobalException(REVIEW_NOT_YOURS);
-        }
-
-        if(reservation.getStatus() != COMPLETED) {
-            throw new GlobalException(RESERVATION_NOT_PROCESSED);
-        }
-
-        log.info("add review -> {}", request.getComments());
-        reviewRepository.save(ReviewEntity.of(request, customer, reservation));
-        return "해당 식당 " + "[" + reservation.getRestaurantEntity().getName() + "]" + "의 리뷰 남겼습니다";
-    }
-
-    /**
-     * 리뷰 수정
-     * 예약이 완료된 후에만 리뷰 수정 가능
-     */
-    @Transactional
-    public String updateReview(ReviewDto request, Long reviewId, String header) {
-        String token = tokenProvider.getToken(header);
-        Long customerId = tokenProvider.getId(token);
-
-        CustomerEntity customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new GlobalException(CUSTOMER_NOT_EXIST));
-
-        ReviewEntity review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new GlobalException(REVIEW_NOT_EXIST));
-
-        // 리뷰 수정은 예약이 완료된 후에만 가능
-        if(!Objects.equals(review.getCustomerEntity().getId(), customer.getId())) {
-            throw new GlobalException(REVIEW_NOT_YOURS);
-        }
-
-        review.setTitle(request.getTitle());
-        review.setComment(request.getComments());
-        review.setRating(request.getRating().getRateValue());
-
-        reviewRepository.save(review);
-        log.info("Review updated -> {}", request.getComments());
-        return "리뷰가 성공적으로 업데이트되었습니다. [" + review.getRestaurantEntity().getName() + "]";
-    }
-
-    /**
-     * 리뷰 삭제
-     * 예약이 완료된 후에만 리뷰 삭제 가능
-     */
-    @Transactional
-    public String deleteReview(Long reviewId, String header) {
-
-        String token = tokenProvider.getToken(header);
-        Long customerId = tokenProvider.getId(token);
-
-        CustomerEntity customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new GlobalException(CUSTOMER_NOT_EXIST));
-
-        ReviewEntity review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new GlobalException(REVIEW_NOT_EXIST));
-
-        if (!Objects.equals(review.getCustomerEntity().getId(), customer.getId())) {
-            throw new GlobalException(REVIEW_NOT_YOURS);
-        }
-
-        reviewRepository.delete(review);
-        log.info("Review deleted for reservation ID: {}", review.getCustomerEntity().getReservationEntities().get(0).getId());
-        return "리뷰가 성공적으로 삭제되었습니다. [" + review.getRestaurantEntity().getName() + "]";
     }
 
     /**

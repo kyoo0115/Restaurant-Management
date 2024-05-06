@@ -41,8 +41,6 @@ public class ManagerService implements UserDetailsService {
     private final RestaurantRepository restaurantRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
-    private final ReservationRepository reservationRepository;
-    private final ReviewRepository reviewRepository;
 
     /**
      * 사용자 이름(이메일)을 바탕으로 사용자 세부 정보를 로드합니다.
@@ -112,115 +110,5 @@ public class ManagerService implements UserDetailsService {
         RestaurantEntity savedRestaurant = restaurantRepository.save(RestaurantEntity.of(registerRestaurantDto, manager));
 
         return RestaurantDto.from(savedRestaurant);
-    }
-
-    /**
-     * 매니저 별 예약 정보 조회
-     */
-    @Transactional
-    public List<ReservationDto> viewReservations(String header, Long restaurantId) {
-
-        String token = tokenProvider.getToken(header);
-        Long managerId = tokenProvider.getId(token);
-
-        ManagerEntity manager = managerRepository.findById(managerId)
-                .orElseThrow(() -> new GlobalException(MANAGER_NOT_EXIST));
-
-        RestaurantEntity restaurant = restaurantRepository.findById(restaurantId)
-                .orElseThrow(() -> new GlobalException(RESTAURANT_NOT_EXIST));
-
-        if (!manager.getRestaurants().contains(restaurant)) {
-            throw new GlobalException(SHOP_MANAGER_NOT_EXIST);
-        }
-
-        return ReservationDto.from(reservationRepository.findReservationEntitiesByManagerEntity(manager));
-    }
-
-    /**
-     * 예약 정보를 이용하여 예약 승인/거절 결정
-     */
-    @Transactional
-    public String acceptOrRefuseReservation(String header, Long reservationId, AcceptStatus acceptStatus) {
-
-        String token = tokenProvider.getToken(header);
-        Long managerId = tokenProvider.getId(token);
-
-        ManagerEntity manager = managerRepository.findById(managerId)
-                .orElseThrow(() -> new GlobalException(MANAGER_NOT_EXIST));
-
-        ReservationEntity reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new GlobalException(RESERVATION_NOT_EXIST));
-
-        checkReservation(reservation);
-
-        reservation.setStatus(acceptStatus.getStatus() ? ACCEPTED : CANCELLED);
-
-        reservationRepository.save(reservation);
-
-        return "예약 번호 " + reservationId + "에 대한 " + (acceptStatus.getStatus() ? "승인" : "거절") + " 처리가 완료되었습니다.";
-    }
-
-    /**
-     * 리뷰 조회
-     */
-    @Transactional
-    public List<ReviewDto> viewReviews(String header, Long restaurantId) {
-        String token = tokenProvider.getToken(header);
-        Long managerId = tokenProvider.getId(token);
-
-        ManagerEntity manager = managerRepository.findById(managerId)
-                .orElseThrow(() -> new GlobalException(MANAGER_NOT_EXIST));
-
-        RestaurantEntity restaurant = restaurantRepository.findById(restaurantId)
-                .orElseThrow(() -> new GlobalException(RESTAURANT_NOT_EXIST));
-
-        if (!manager.getRestaurants().contains(restaurant)) {
-            throw new GlobalException(SHOP_MANAGER_NOT_EXIST);
-        }
-
-        return ReviewDto.from(reviewRepository.findReviewEntitiesByRestaurantEntity(restaurant));
-    }
-
-    /**
-     * 리뷰 삭제
-     */
-    @Transactional
-    public String deleteReview(String header, Long reviewId) {
-
-        String token = tokenProvider.getToken(header);
-        Long managerId = tokenProvider.getId(token);
-
-        ManagerEntity manager = managerRepository.findById(managerId)
-                .orElseThrow(() -> new GlobalException(MANAGER_NOT_EXIST));
-
-        ReviewEntity review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new GlobalException(REVIEW_NOT_EXIST));
-
-        if (!Objects.equals(review.getManagerEntity().getId(), manager.getId())) {
-            throw new GlobalException(REVIEW_NOT_YOURS);
-        }
-
-        reviewRepository.deleteById(reviewId);
-        return "리뷰가 성공적으로 삭제되었습니다. [" + review.getRestaurantEntity().getName() + "]";
-    }
-
-    /**
-     * 예약 검증
-     */
-    private void checkReservation(ReservationEntity reservation) {
-        // 이미 취소된 예약인 경우
-        if (reservation.getStatus() == CANCELLED) {
-            throw new GlobalException(RESERVATION_ALREADY_CANCELED);
-        }
-
-        // 이미 완료 처리된 예약인 경우
-        if (reservation.getStatus() == COMPLETED) {
-            throw new GlobalException(RESERVATION_ALREADY_VISITED);
-        }
-
-        // 이미 확인(승인)한 예약인 경우
-        if (reservation.getStatus() == ACCEPTED) {
-            throw new GlobalException(RESERVATION_ALREADY_PROCESSED);
-        }
     }
 }

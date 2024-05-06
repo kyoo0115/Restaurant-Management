@@ -31,9 +31,9 @@ public class SecurityConfiguration {
                         SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(e -> e
                         .requestMatchers(
-                                "/signup/customer", "/signin/customer",
-                                "/signup/manager", "/signin/manager",
-                                "/customer/view-restaurants")
+                                "/customer/signin", "/customer/signup",
+                                "/manager/signin", "/manager/signup",
+                                "/restaurants/view")
                         .permitAll()
                         .anyRequest()
                         .authenticated())

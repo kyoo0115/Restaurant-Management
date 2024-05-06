@@ -23,7 +23,7 @@ public class AuthenticationService {
 
     public Authentication getAuthentication(String jwt) {
 
-        UserType userType = getUserType(jwt);
+        UserType userType = tokenProvider.getUserType(jwt);
         String username = tokenProvider.getUsername(jwt);
 
         UserDetails userDetails = getUserDetailsService(userType).loadUserByUsername(username);
@@ -32,11 +32,5 @@ public class AuthenticationService {
 
     private UserDetailsService getUserDetailsService(UserType userType) {
         return userType == UserType.CUSTOMER ? customerService : managerService;
-    }
-
-    private UserType getUserType(String token) {
-        Claims claims = tokenProvider.parseClaims(token);
-
-        return UserType.valueOf(claims.get("roles", String.class));
     }
 }

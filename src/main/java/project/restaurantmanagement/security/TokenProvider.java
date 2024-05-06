@@ -123,4 +123,10 @@ public class TokenProvider {
         Claims claims = parseClaims(token);
         return Long.parseLong(claims.get("id").toString());
     }
+
+    public UserType getUserType(String token) {
+        Claims claims = this.parseClaims(token);
+
+        return UserType.valueOf(claims.get("roles", String.class));
+    }
 }
