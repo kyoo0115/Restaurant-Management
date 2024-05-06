@@ -15,6 +15,11 @@ import java.util.List;
 import static project.restaurantmanagement.model.Type.AcceptStatus.ACCEPT;
 import static project.restaurantmanagement.model.Type.AcceptStatus.REFUSE;
 
+/**
+ * 예약 관련 요청을 처리하는 컨트롤러입니다.
+ * 고객과 매니저의 예약 생성, 조회 및 관리 기능을 제공합니다.
+ */
+
 @RestController
 @RequestMapping("/reservations")
 @RequiredArgsConstructor
@@ -26,7 +31,8 @@ public class ReservationController {
     private static final String AUTH_HEADER = "Authorization";
 
     /**
-     * 신규 예약 생성
+     * 고객에 의한 신규 예약 생성
+     * 고객의 인증 후 예약 정보 저장
      */
     @PostMapping("/create")
     @PreAuthorize("hasRole('CUSTOMER')")
@@ -38,7 +44,8 @@ public class ReservationController {
     }
 
     /**
-     * 예약 목록 조회
+     * 매니저에 의한 예약 목록 조회
+     * 매니저가 관리하는 매장의 모든 예약 정보 조회
      */
     @GetMapping("/{restaurantId}")
     @PreAuthorize("hasRole('MANAGER')")
@@ -50,7 +57,8 @@ public class ReservationController {
     }
 
     /**
-     * 예약 승인
+     * 매니저에 의한 예약 승인
+     * 주어진 예약 ID에 대한 승인 처리
      */
     @PatchMapping("/accept/{reservationId}")
     @PreAuthorize("hasRole('MANAGER')")
@@ -61,7 +69,8 @@ public class ReservationController {
     }
 
     /**
-     * 예약 거절
+     * 매니저에 의한 예약 거절
+     * 주어진 예약 ID에 대한 거절 처리
      */
     @PatchMapping("/refuse/{reservationId}")
     @PreAuthorize("hasRole('MANAGER')")

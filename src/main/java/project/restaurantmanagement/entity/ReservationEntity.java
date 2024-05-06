@@ -9,6 +9,11 @@ import java.time.LocalDateTime;
 
 import static jakarta.persistence.FetchType.LAZY;
 
+/**
+ * 예약 entity
+ * 정보 : 인원, 예약 시간, 식당 id
+ */
+
 @Entity
 @Table(name = "reservation")
 @Getter

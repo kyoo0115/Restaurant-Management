@@ -5,6 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 import project.restaurantmanagement.model.Type.UserType;
 
+/**
+ * 로그인 요청 DTO
+ */
+
 public class SignInDto {
 
     @Getter

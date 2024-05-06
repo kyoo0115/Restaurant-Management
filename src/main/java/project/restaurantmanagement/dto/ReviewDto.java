@@ -6,6 +6,10 @@ import project.restaurantmanagement.model.Type.Rating;
 
 import java.util.List;
 
+/**
+ * 리뷰 정보 DTO
+ */
+
 @Getter
 @Setter
 @Builder

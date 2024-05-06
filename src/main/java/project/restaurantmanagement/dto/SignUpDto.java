@@ -1,11 +1,13 @@
 package project.restaurantmanagement.dto;
 
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Data
+/**
+ * 회원가입 DTO
+ */
+
 public class SignUpDto {
 
     @Getter
