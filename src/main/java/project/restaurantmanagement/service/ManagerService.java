@@ -10,22 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.restaurantmanagement.dto.*;
 import project.restaurantmanagement.entity.ManagerEntity;
-import project.restaurantmanagement.entity.ReservationEntity;
 import project.restaurantmanagement.entity.RestaurantEntity;
-import project.restaurantmanagement.entity.ReviewEntity;
 import project.restaurantmanagement.exception.GlobalException;
-import project.restaurantmanagement.model.Type.AcceptStatus;
 import project.restaurantmanagement.repository.ManagerRepository;
-import project.restaurantmanagement.repository.ReservationRepository;
 import project.restaurantmanagement.repository.RestaurantRepository;
-import project.restaurantmanagement.repository.ReviewRepository;
 import project.restaurantmanagement.security.TokenProvider;
 
-import java.util.List;
-import java.util.Objects;
-
 import static project.restaurantmanagement.exception.ErrorCode.*;
-import static project.restaurantmanagement.model.Type.ReservationStatus.*;
 
 /**
  * 매니저 관련 서비스를 제공하는 클래스입니다.

@@ -14,5 +14,4 @@ public interface ReservationRepository extends BaseRepository<ReservationEntity,
     List<ReservationEntity> findReservationEntitiesByManagerEntity(ManagerEntity manager);
 
     List<ReservationEntity> findByStatusAndReservationTimeLessThanEqual(ReservationStatus reservationStatus, LocalDateTime localDateTime);
-
 }
