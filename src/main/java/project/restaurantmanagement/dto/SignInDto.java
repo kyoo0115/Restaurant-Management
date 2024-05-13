@@ -3,7 +3,7 @@ package project.restaurantmanagement.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import project.restaurantmanagement.model.Type.UserType;
+import project.restaurantmanagement.model.type.UserType;
 
 /**
  * 로그인 요청 DTO

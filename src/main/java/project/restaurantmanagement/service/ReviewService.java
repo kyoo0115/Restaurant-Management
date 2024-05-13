@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static project.restaurantmanagement.exception.ErrorCode.*;
-import static project.restaurantmanagement.model.Type.ReservationStatus.*;
+import static project.restaurantmanagement.model.type.ReservationStatus.*;
 
 @Service
 @RequiredArgsConstructor

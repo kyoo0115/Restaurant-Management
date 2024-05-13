@@ -3,7 +3,7 @@ package project.restaurantmanagement.repository;
 import org.springframework.stereotype.Repository;
 import project.restaurantmanagement.entity.ManagerEntity;
 import project.restaurantmanagement.entity.ReservationEntity;
-import project.restaurantmanagement.model.Type.ReservationStatus;
+import project.restaurantmanagement.model.type.ReservationStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;

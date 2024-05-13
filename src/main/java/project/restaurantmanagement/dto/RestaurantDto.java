@@ -18,7 +18,6 @@ import java.util.List;
 @AllArgsConstructor
 public class RestaurantDto {
 
-    private Long id;
     private Long managerId;
     private String name;
     private String description;
@@ -26,7 +25,6 @@ public class RestaurantDto {
 
     public static RestaurantDto from(RestaurantEntity restaurant) {
         return RestaurantDto.builder()
-                .id(restaurant.getId())
                 .managerId(restaurant.getManagerEntity().getId())
                 .name(restaurant.getName())
                 .description(restaurant.getDescription())

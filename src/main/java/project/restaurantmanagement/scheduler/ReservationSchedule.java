@@ -5,7 +5,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import project.restaurantmanagement.entity.ReservationEntity;
-import project.restaurantmanagement.model.Type.ReservationStatus;
+import project.restaurantmanagement.model.type.ReservationStatus;
 import project.restaurantmanagement.repository.ReservationRepository;
 
 import java.time.LocalDateTime;

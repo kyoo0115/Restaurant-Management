@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.restaurantmanagement.entity.ReservationEntity;
-import project.restaurantmanagement.model.Type.ReservationStatus;
+import project.restaurantmanagement.model.type.ReservationStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,7 +20,6 @@ import java.util.List;
 @AllArgsConstructor
 public class ReservationDto {
 
-    private Long id;
     private Long customerId;
     private Long restaurantId;
     private Long managerId;
@@ -29,7 +28,6 @@ public class ReservationDto {
 
     public static ReservationDto from(ReservationEntity reservationEntity) {
         return ReservationDto.builder()
-                .id(reservationEntity.getId())
                 .customerId(reservationEntity.getCustomerEntity().getId())
                 .restaurantId(reservationEntity.getRestaurantEntity().getId())
                 .managerId(reservationEntity.getManagerEntity().getId())

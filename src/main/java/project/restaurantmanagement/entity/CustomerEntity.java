@@ -6,13 +6,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import project.restaurantmanagement.dto.SignUpDto;
-import project.restaurantmanagement.model.Type.UserType;
+import project.restaurantmanagement.model.type.UserType;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static project.restaurantmanagement.model.Type.UserType.CUSTOMER;
+import static project.restaurantmanagement.model.type.UserType.CUSTOMER;
 
 /**
  * 고객 entity

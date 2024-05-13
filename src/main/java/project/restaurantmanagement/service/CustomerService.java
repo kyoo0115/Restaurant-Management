@@ -19,7 +19,7 @@ import project.restaurantmanagement.repository.RestaurantRepository;
 import project.restaurantmanagement.security.TokenProvider;
 
 import static project.restaurantmanagement.exception.ErrorCode.*;
-import static project.restaurantmanagement.model.Type.ReservationStatus.*;
+import static project.restaurantmanagement.model.type.ReservationStatus.*;
 
 /**
  * 회원 관련 서비스를 제공하는 클래스입니다.

@@ -9,7 +9,7 @@ import project.restaurantmanagement.entity.ManagerEntity;
 import project.restaurantmanagement.entity.ReservationEntity;
 import project.restaurantmanagement.entity.RestaurantEntity;
 import project.restaurantmanagement.exception.GlobalException;
-import project.restaurantmanagement.model.Type.AcceptStatus;
+import project.restaurantmanagement.model.type.AcceptStatus;
 import project.restaurantmanagement.repository.ManagerRepository;
 import project.restaurantmanagement.repository.ReservationRepository;
 import project.restaurantmanagement.repository.RestaurantRepository;
@@ -18,8 +18,8 @@ import project.restaurantmanagement.security.TokenProvider;
 import java.util.List;
 
 import static project.restaurantmanagement.exception.ErrorCode.*;
-import static project.restaurantmanagement.model.Type.ReservationStatus.*;
-import static project.restaurantmanagement.model.Type.ReservationStatus.ACCEPTED;
+import static project.restaurantmanagement.model.type.ReservationStatus.*;
+import static project.restaurantmanagement.model.type.ReservationStatus.ACCEPTED;
 
 @Service
 @RequiredArgsConstructor

@@ -12,8 +12,8 @@ import project.restaurantmanagement.service.ReservationService;
 
 import java.util.List;
 
-import static project.restaurantmanagement.model.Type.AcceptStatus.ACCEPT;
-import static project.restaurantmanagement.model.Type.AcceptStatus.REFUSE;
+import static project.restaurantmanagement.model.type.AcceptStatus.ACCEPT;
+import static project.restaurantmanagement.model.type.AcceptStatus.REFUSE;
 
 /**
  * 예약 관련 요청을 처리하는 컨트롤러입니다.

@@ -2,7 +2,7 @@ package project.restaurantmanagement.dto;
 
 import lombok.*;
 import project.restaurantmanagement.entity.ReviewEntity;
-import project.restaurantmanagement.model.Type.Rating;
+import project.restaurantmanagement.model.type.Rating;
 
 import java.util.List;
 

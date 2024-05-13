@@ -1,4 +1,4 @@
-package project.restaurantmanagement.model.Type;
+package project.restaurantmanagement.model.type;
 
 /**
  * 예약 상태를 표현하는 상수

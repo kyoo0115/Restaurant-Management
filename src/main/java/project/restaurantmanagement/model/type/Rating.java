@@ -1,4 +1,4 @@
-package project.restaurantmanagement.model.Type;
+package project.restaurantmanagement.model.type;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
